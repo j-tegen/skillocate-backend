@@ -245,40 +245,52 @@ def create_merit():
 
     return jsonify(idrecord="{idrecord}".format(idrecord=merit.idmerit))
 
+############# EDUCATIONS #############
 @app.route('/api/educations', methods=['GET'])
 @auth.login_required
-def get_user_educations():
+def get_educations():
     user = g.user
     educations = Education.query.filter_by(profile=user.profile).all()
+    
     if educations is None:
         return abort(404)
+        
     retval = []
     for edu in educations:
-            retval.append(edu.serialize)
-    print(retval)
+        retval.append(edu.serialize)
+
     return jsonify(data=retval)
 
 
-@app.route('/api/education', methods=['POST'])
+@app.route('/api/educations', methods=['POST'])
+@auth.login_required
+def create_education():
+    if not request.json:
+        abort(400)
+    
+    education = Education(request.json, g.user.iduser)
+    db.session.add(education)
+    db.session.commit()
+
+    return jsonify(data=education.serialize)
+
+@app.route('/api/educations', methos=['PUT'])
 @auth.login_required
 def update_education():
+    if not request.json:
+        abort(400)
 
     ideducation = request.json['ideducation']
 
-    profile = g.user.rel_profile
-
     if ideducation is None:
-        education = Education(request.json, profile.idprofile)
-        db.session.add(education)
+        abort(404)
 
-    else:
-        education = Education.query.get(ideducation)
-        education.update(request.json)
-
+    education = Education.query.get(ideducation)
+    education.update(request.json)
     db.session.commit()
 
-    return jsonify(idrecord="{idrecord}".format(idrecord=education.ideducation))
-
+    return jsonify(data=education.serialize)
+############# /EDUCATIONS #############
 
 @app.route('/api/skills', methods=['GET'])
 @auth.login_required
@@ -289,7 +301,7 @@ def get_user_skills():
         return abort(404)
     retval = []
     for s in skills:
-            retval.append(s.serialize)
+        retval.append(s.serialize)
 
     return jsonify(data=retval)
 
