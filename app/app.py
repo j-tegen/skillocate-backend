@@ -232,6 +232,7 @@ def get_user_merits():
 @auth.login_required
 def create_merit():
     idmerit = request.json['idmerit']
+    print("hej")
     profile = g.user.rel_profile
 
     if idmerit is None:
