@@ -249,8 +249,14 @@ def create_merit():
 @app.route('/api/educations', methods=['GET'])
 @auth.login_required
 def get_educations():
-    user = g.user
-    educations = Education.query.filter_by(profile=user.profile).all()
+
+    iduser = requst.json['iduser']
+    
+    if iduser is None:
+        iduser = g.user
+    
+    
+    educations = Education.query.filter_by(user=user.iduser).all()
     
     if educations is None:
         return abort(404)
@@ -274,7 +280,7 @@ def create_education():
 
     return jsonify(data=education.serialize)
 
-@app.route('/api/educations', methos=['PUT'])
+@app.route('/api/educations', methods=['PUT'])
 @auth.login_required
 def update_education():
     if not request.json:
