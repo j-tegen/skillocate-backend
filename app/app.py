@@ -246,24 +246,26 @@ def create_merit():
     return jsonify(idrecord="{idrecord}".format(idrecord=merit.idmerit))
 
 ############# EDUCATIONS #############
-@app.route('/api/educations', methods=['GET'])
+@app.route('/api/educations/<int:ideducation>', methods=['GET'])
 @auth.login_required
-def get_educations():
+def get_educations(ideducation):
 
-    iduser = requst.json['iduser']
-    
-    if iduser is None:
-        iduser = g.user
-    
-    
-    educations = Education.query.filter_by(user=user.iduser).all()
-    
-    if educations is None:
-        return abort(404)
+    if ideducation is not None:
+        retval = Education.query.get(ideducation)
+    else: 
+        iduser = requst.args.get('iduser')
         
-    retval = []
-    for edu in educations:
-        retval.append(edu.serialize)
+        if iduser is None:
+            iduser = g.user
+        
+        educations = Education.query.filter_by(user=user.iduser).all()
+        
+        if educations is None:
+            return abort(404)
+            
+        retval = []
+        for edu in educations:
+            retval.append(edu.serialize)
 
     return jsonify(data=retval)
 
