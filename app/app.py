@@ -246,6 +246,7 @@ def create_merit():
     return jsonify(idrecord="{idrecord}".format(idrecord=merit.idmerit))
 
 ############# EDUCATIONS #############
+@app.route('/api/educations', methods=['GET'])
 @app.route('/api/educations/<int:ideducation>', methods=['GET'])
 @auth.login_required
 def get_educations(ideducation):
