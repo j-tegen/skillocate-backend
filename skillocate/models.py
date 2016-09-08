@@ -773,11 +773,15 @@ class User(db.Model):
     iduser = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128))
     password = db.Column(db.String(128))
+    admin = db.Column(db.Boolean)
 
     def __init__(self, email, password):
         self.email = email.lower()
         self.set_password(password)
-        # self.profile = profile
+        self.admin = False
+
+    def set_admin(self, is_admin):
+        self.admin = is_admin
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
