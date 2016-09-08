@@ -201,8 +201,8 @@ def get_educations(iduser, ideducation):
     if ideducation is not None:
         retval = Education.query.get(ideducation)
     elif iduser is not None: 
-        if iduser != g.user.iduser and !g.user.admin:
-            return abort(401)
+        # if iduser != g.user.iduser and !g.user.admin:
+        #     return abort(401)
 
         educations = Education.query.filter_by(user=user.iduser).all()
         if educations is None:
