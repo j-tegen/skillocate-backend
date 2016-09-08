@@ -1,58 +1,7 @@
+from skillocate import app, auth
+from skillocate import db
 from flask import Flask, request, jsonify, abort, session, g
-from flask.ext.httpauth import HTTPBasicAuth
 from flask_sqlalchemy import SQLAlchemy
-from functools import update_wrapper
-import os
-import config
-from elasticsearch import Elasticsearch
-
-
-app = Flask(__name__)
-app.secret_key = config.secret_key
-app.config['SQLALCHEMY_DATABASE_URI'] = config.connection_string
-
-print(app.config['SQLALCHEMY_DATABASE_URI'])
-auth = HTTPBasicAuth()
-db = SQLAlchemy(app)
-
-from models import *
-
-db.create_all()
-db.session.commit()
-
-db.init_app(app)
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in config.ALLOWED_EXTENSIONS
-
-@app.route('/')
-def home():
-    return app.send_static_file('base.html')
-
-@auth.verify_password
-def verify_password(email_or_token,password):
-    # first try to authenticate by token
-    print(email_or_token)
-    user = User.verify_auth_token(email_or_token)
-    if not user:
-        # try to authenticate with username/password
-        user = User.query.filter_by(email = email_or_token).first()
-        if not user or not user.check_password(password):
-            return False
-    g.user = user
-    return True
-
-@app.route('/api/token')
-@auth.login_required
-def get_auth_token():
-    try:
-        user = g.user
-        print(user.generate_auth_token())
-        token = g.user.generate_auth_token()
-    except Exception as err:
-        print(err)
-    return jsonify({ 'token': token.decode('ascii') })
 
 @app.route('/api/skilltypes', methods=['GET'])
 @auth.login_required
@@ -246,21 +195,34 @@ def create_merit():
     return jsonify(idrecord="{idrecord}".format(idrecord=merit.idmerit))
 
 ############# EDUCATIONS #############
-@app.route('/api/educations', methods=['GET'])
+@app.route('/api/users/<int:iduser>/educations/<int:ideducation>', methods=['GET'])
 @auth.login_required
-def get_educations():
-    user = g.user
-    educations = Education.query.filter_by(profile=user.profile).all()
-    
-    if educations is None:
-        return abort(404)
-        
-    retval = []
-    for edu in educations:
-        retval.append(edu.serialize)
+def get_educations(iduser, ideducation):
+    if ideducation is not None:
+        retval = Education.query.get(ideducation)
+    elif iduser is not None: 
+        if iduser != g.user.iduser and !g.user.admin:
+            return abort(401)
+
+        educations = Education.query.filter_by(user=user.iduser).all()
+        if educations is None:
+            return abort(404)
+        retval = []
+        for edu in educations:
+            retval.append(edu.serialize)
+    else:
+        return abort(400)
 
     return jsonify(data=retval)
 
+@app.route('/api/educations', methods=['GET'])
+@auth.login_required
+def get_all_educations():
+    retval = []
+    educations = Education.query.all()
+    for edu in educations:
+        retval.append(edu.serialize)
+    return jsonify(data=retval)
 
 @app.route('/api/educations', methods=['POST'])
 @auth.login_required
@@ -274,7 +236,7 @@ def create_education():
 
     return jsonify(data=education.serialize)
 
-@app.route('/api/educations', methos=['PUT'])
+@app.route('/api/educations', methods=['PUT'])
 @auth.login_required
 def update_education():
     if not request.json:
@@ -690,9 +652,3 @@ def search():
         res.profiles.append(Profile.query.get(p).serialize)
 
     return jsonify(res.serialize)
-
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
-    print("starting service...")
-    app.run(host=config.host_ip, port=port, debug=False, threaded=True)
