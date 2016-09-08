@@ -61,13 +61,13 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user is None:
-        return jsonify(response=False)
+        return abort(401)
 
     if user.check_password(password):
         token = user.generate_auth_token()
         return jsonify({ 'token': token.decode('ascii') })
 
-    return jsonify(response=False)
+    return abort(401)
 
 
 @app.route('/api/signout', methods=['POST'])
