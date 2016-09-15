@@ -61,11 +61,11 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user is None:
-        return abort(401)
+        return jsonify(response=False)
 
     if user.check_password(password):
         token = user.generate_auth_token()
-        return jsonify({ 'token': token.decode('ascii') })
+        return jsonify(response={ 'token': token.decode('ascii'), 'iduser' : user.iduser })
 
     return abort(401)
 
@@ -196,16 +196,10 @@ def create_merit():
     return jsonify(idrecord="{idrecord}".format(idrecord=merit.idmerit))
 
 ############# EDUCATIONS #############
-@app.route('/api/users/<int:iduser>/educations/<int:ideducation>', methods=['GET'])
+@app.route('/api/users/<int:iduser>/educations', methods=['GET'])
 @auth.login_required
-def get_educations(iduser, ideducation):
-    if ideducation is not None:
-        retval = Education.query.get(ideducation)
-        if retval is None:
-            return abort(404)
-        return jsonify(data=retval)
-
-    educations = Education.query.filter_by(user=user.iduser).all()
+def get_educations(iduser):
+    educations = Education.query.filter_by(user=iduser).all()
     if educations is None:
         return abort(404)
     retval = []
@@ -213,6 +207,16 @@ def get_educations(iduser, ideducation):
         retval.append(edu.serialize)
 
     return jsonify(data=retval)
+
+@app.route('/api/educations/<int:ideducation>', methods=['GET'])
+@auth.login_required
+def get_education(iduser, ideducation):
+    retval = Education.query.get(ideducation)
+    if retval is None:
+        return abort(404)
+    return jsonify(data=retval)
+
+    
 
 @app.route('/api/educations', methods=['GET'])
 @auth.login_required

@@ -159,7 +159,7 @@ class Education(db.Model):
             'startdate': self.startdate,
             'enddate': self.enddate,
             'description': self.description,
-            'user': self.rel_user.serialize,
+            'user': self.user,
             'timestamp': self.timestamp,
             'descriptive_header': self.title + ' - ' + self.education,
             'descriptive_subheader': self.school
@@ -928,275 +928,275 @@ def get_skilltypes(iduser):
 
 
 ########## ELASTIC SEARCH #########
-def after_education_insert(mapper, connection, target):
-    es = Elasticsearch()
-    es.index(index="knowbase", doc_type="education", id=target.ideducation,
-             body={
-                    'ideducation': target.ideducation,
-                    'title': target.title,
-                    'education': target.education,
-                    'school': target.school,
-                    'startdate': target.startdate,
-                    'enddate': target.enddate,
-                    'description': target.description,
-                    'profile': target.profile,
-                    'timestamp': target.timestamp
-             })
+# def after_education_insert(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.index(index="knowbase", doc_type="education", id=target.ideducation,
+#              body={
+#                     'ideducation': target.ideducation,
+#                     'title': target.title,
+#                     'education': target.education,
+#                     'school': target.school,
+#                     'startdate': target.startdate,
+#                     'enddate': target.enddate,
+#                     'description': target.description,
+#                     'profile': target.profile,
+#                     'timestamp': target.timestamp
+#              })
 
-def after_education_update(mapper, connection, target):
-    es = Elasticsearch()
-    es.update(index='knowbase',doc_type='education',id=target.ideducation,
-                body={"doc": {
-                    'ideducation': target.ideducation,
-                    'title': target.title,
-                    'education': target.education,
-                    'school': target.school,
-                    'startdate': target.startdate,
-                    'enddate': target.enddate,
-                    'description': target.description,
-                    'profile': target.profile,
-                    'timestamp': target.timestamp
-                }})
-def after_education_delete(mapper, connection, target):
-    es = Elasticsearch()
-    es.delete(index='knowbase', doc_type='education', id=target.ideducation)
-
-
-def after_workexperience_insert(mapper, connection, target):
-    es = Elasticsearch()
-    es.index(index="knowbase", doc_type="workexperience", id=target.idworkexperience,
-             body={
-                'idworkexperience': target.idworkexperience,
-                'title': target.title,
-                'employer': target.employer,
-                'startdate': target.startdate,
-                'enddate': target.enddate,
-                'description': target.description,
-                'profile': target.profile
-            })
-
-def after_workexperience_update(mapper, connection, target):
-    es = Elasticsearch()
-    es.update(index='knowbase',doc_type='workexperience',id=target.idworkexperience,
-                body={"doc": {
-                'idworkexperience': target.idworkexperience,
-                'title': target.title,
-                'employer': target.employer,
-                'startdate': target.startdate,
-                'enddate': target.enddate,
-                'description': target.description,
-                'profile': target.profile
-            }})
-def after_workexperience_delete(mapper, connection, target):
-    es = Elasticsearch()
-    es.delete(index='knowbase',doc_type='workexperience',id=target.idworkexperience)
-
-def after_project_insert(mapper, connection, target):
-    es = Elasticsearch()
-
-    es.index(index='knowbase',doc_type='project',id=target.idproject,
-             body={
-                'idproject': target.idproject,
-                'name': target.name,
-                'hours': target.hours,
-                #'customer': target.rel_customer.serialize,
-                'startdate': target.startdate,
-                'enddate': target.enddate,
-                'description': target.description,
-                'profile': target.profile
-            })
+# def after_education_update(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.update(index='knowbase',doc_type='education',id=target.ideducation,
+#                 body={"doc": {
+#                     'ideducation': target.ideducation,
+#                     'title': target.title,
+#                     'education': target.education,
+#                     'school': target.school,
+#                     'startdate': target.startdate,
+#                     'enddate': target.enddate,
+#                     'description': target.description,
+#                     'profile': target.profile,
+#                     'timestamp': target.timestamp
+#                 }})
+# def after_education_delete(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.delete(index='knowbase', doc_type='education', id=target.ideducation)
 
 
-def after_project_update(mapper, connection, target):
-    es = Elasticsearch()
-    try:
-        es.update(index='knowbase',doc_type='project',id=target.idproject,
-                    body={"doc": {
-                    'idproject': target.idproject,
-                    'name': target.name,
-                    'hours': target.hours,
-                    'customer': target.rel_customer.serialize,
-                    'startdate': target.startdate,
-                    'enddate': target.enddate,
-                    'description': target.description,
-                    'profile': target.profile
-                }})
-    except Exception as err:
-        print(err)
+# def after_workexperience_insert(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.index(index="knowbase", doc_type="workexperience", id=target.idworkexperience,
+#              body={
+#                 'idworkexperience': target.idworkexperience,
+#                 'title': target.title,
+#                 'employer': target.employer,
+#                 'startdate': target.startdate,
+#                 'enddate': target.enddate,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             })
 
-def after_project_delete(mapper, connection, target):
-    es = Elasticsearch()
-    es.delete(index='knowbase',doc_type='project',id=target.idproject)
+# def after_workexperience_update(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.update(index='knowbase',doc_type='workexperience',id=target.idworkexperience,
+#                 body={"doc": {
+#                 'idworkexperience': target.idworkexperience,
+#                 'title': target.title,
+#                 'employer': target.employer,
+#                 'startdate': target.startdate,
+#                 'enddate': target.enddate,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             }})
+# def after_workexperience_delete(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.delete(index='knowbase',doc_type='workexperience',id=target.idworkexperience)
 
-def after_experience_insert(mapper, connection, target):
-    es = Elasticsearch()
-    es.index(index='knowbase',doc_type='experience',id=target.idexperience,
-             body={
-                'idexperience': target.idexperience,
-                'name': target.name,
-                'startdate': target.startdate,
-                'enddate': target.enddate,
-                'description': target.description,
-                'profile': target.profile
-            })
+# def after_project_insert(mapper, connection, target):
+#     es = Elasticsearch()
 
-def after_experience_update(mapper, connection, target):
-    es = Elasticsearch()
-    es.update(index='knowbase',doc_type='experience',id=target.idexperience,
-                body={"doc": {
-                'idexperience': target.idexperience,
-                'name': target.name,
-                'startdate': target.startdate,
-                'enddate': target.enddate,
-                'description': target.description,
-                'profile': target.profile
-            }})
-def after_experience_delete(mapper, connection, target):
-    es = Elasticsearch()
-    es.delete(index='knowbase',doc_type='experience',id=target.idexperience)
+#     es.index(index='knowbase',doc_type='project',id=target.idproject,
+#              body={
+#                 'idproject': target.idproject,
+#                 'name': target.name,
+#                 'hours': target.hours,
+#                 #'customer': target.rel_customer.serialize,
+#                 'startdate': target.startdate,
+#                 'enddate': target.enddate,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             })
 
 
-def after_language_insert(mapper, connection, target):
-    es = Elasticsearch()
-    es.index(index='knowbase',doc_type='language',id=target.idlanguage,
-             body={
-            'idlanguage': target.idlanguage,
-            'language': target.language,
-            'listening': target.listening,
-            'writing':target.writing,
-            'reading': target.reading,
-            'conversation': target.conversation,
-            'verbal': target.verbal,
-            'profile': target.profile
-        })
+# def after_project_update(mapper, connection, target):
+#     es = Elasticsearch()
+#     try:
+#         es.update(index='knowbase',doc_type='project',id=target.idproject,
+#                     body={"doc": {
+#                     'idproject': target.idproject,
+#                     'name': target.name,
+#                     'hours': target.hours,
+#                     'customer': target.rel_customer.serialize,
+#                     'startdate': target.startdate,
+#                     'enddate': target.enddate,
+#                     'description': target.description,
+#                     'profile': target.profile
+#                 }})
+#     except Exception as err:
+#         print(err)
 
-def after_language_update(mapper, connection, target):
-    es = Elasticsearch()
-    es.update(index='knowbase',doc_type='language',id=target.idlanguage,
-                body={"doc": {
-                'idlanguage': target.idlanguage,
-                'language': target.language,
-                'listening': target.listening,
-                'writing':target.writing,
-                'reading': target.reading,
-                'conversation': target.conversation,
-                'verbal': target.verbal,
-                'profile': target.profile
-            }})
-def after_language_delete(mapper, connection, target):
-    es = Elasticsearch()
-    es.delete(index='knowbase',doc_type='language',id=target.idlanguage)
+# def after_project_delete(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.delete(index='knowbase',doc_type='project',id=target.idproject)
 
-def after_publication_insert(mapper, connection, target):
-    es = Elasticsearch()
-    es.index(index='knowbase',doc_type='publication',id=target.idpublication,
-             body={
-                'idpublication': target.idpublication,
-                'title': target.title,
-                'authors': target.authors,
-                'publication': target.publication,
-                'date': target.date,
-                'description': target.description,
-                'profile': target.profile
-            })
+# def after_experience_insert(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.index(index='knowbase',doc_type='experience',id=target.idexperience,
+#              body={
+#                 'idexperience': target.idexperience,
+#                 'name': target.name,
+#                 'startdate': target.startdate,
+#                 'enddate': target.enddate,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             })
 
-def after_publication_update(mapper, connection, target):
-    es = Elasticsearch()
-    es.update(index='knowbase',doc_type='publication',id=target.idpublication,
-                body={"doc": {
-                'idpublication': target.idpublication,
-                'title': target.title,
-                'authors': target.authors,
-                'publication': target.publication,
-                'date': target.date,
-                'description': target.description,
-                'profile': target.profile
-            }})
-def after_publication_delete(mapper, connection, target):
-    es = Elasticsearch()
-    es.delete(index='knowbase',doc_type='publication',id=target.idpublication)
-
-def after_skill_insert(mapper, connection, target):
-    es = Elasticsearch()
-    es.index(index='knowbase',doc_type='skill',id=target.idskill,
-             body={
-                'idskill': target.idskill,
-                'name': target.name,
-                'level': target.level,
-                'description': target.description,
-                'profile': target.profile
-            })
-
-def after_skill_update(mapper, connection, target):
-    es = Elasticsearch()
-    es.update(index='knowbase',doc_type='skill',id=target.idskill,
-                body={"doc": {
-                'idskill': target.idskill,
-                'name': target.name,
-                'level': target.level,
-                'description': target.description,
-                'profile': target.profile
-            }})
-
-def after_skill_delete(mapper, connection, target):
-    es = Elasticsearch()
-    es.delete(index='knowbase',doc_type='skill',id=target.idskill)
-
-def after_merit_insert(mapper, connection, target):
-    es = Elasticsearch()
-    es.index(index='knowbase',doc_type='merit',id=target.idmerit,
-             body={
-                'idmerit': target.idmerit,
-                'name': target.name,
-                'date': target.date,
-                'description': target.description,
-                'profile': target.profile
-            })
-
-def after_merit_update(mapper, connection, target):
-    es = Elasticsearch()
-    es.update(index='knowbase',doc_type='merit',id=target.idmerit,
-                body={"doc": {
-                'idmerit': target.idmerit,
-                'name': target.name,
-                'date': target.date,
-                'description': target.description,
-                'profile': target.profile
-            }})
-
-def after_merit_delete(mapper, connection, target):
-    es = Elasticsearch()
-    es.delete(index='knowbase',doc_type='merit',id=target.idmerit)
+# def after_experience_update(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.update(index='knowbase',doc_type='experience',id=target.idexperience,
+#                 body={"doc": {
+#                 'idexperience': target.idexperience,
+#                 'name': target.name,
+#                 'startdate': target.startdate,
+#                 'enddate': target.enddate,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             }})
+# def after_experience_delete(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.delete(index='knowbase',doc_type='experience',id=target.idexperience)
 
 
-event.listen(Education, 'after_insert', after_education_insert)
-event.listen(Education, 'after_update', after_education_update)
-event.listen(Education, 'after_delete', after_education_delete)
+# def after_language_insert(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.index(index='knowbase',doc_type='language',id=target.idlanguage,
+#              body={
+#             'idlanguage': target.idlanguage,
+#             'language': target.language,
+#             'listening': target.listening,
+#             'writing':target.writing,
+#             'reading': target.reading,
+#             'conversation': target.conversation,
+#             'verbal': target.verbal,
+#             'profile': target.profile
+#         })
 
-event.listen(WorkExperience, 'after_insert', after_workexperience_insert)
-event.listen(WorkExperience, 'after_update', after_workexperience_update)
-event.listen(WorkExperience, 'after_delete', after_workexperience_delete)
+# def after_language_update(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.update(index='knowbase',doc_type='language',id=target.idlanguage,
+#                 body={"doc": {
+#                 'idlanguage': target.idlanguage,
+#                 'language': target.language,
+#                 'listening': target.listening,
+#                 'writing':target.writing,
+#                 'reading': target.reading,
+#                 'conversation': target.conversation,
+#                 'verbal': target.verbal,
+#                 'profile': target.profile
+#             }})
+# def after_language_delete(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.delete(index='knowbase',doc_type='language',id=target.idlanguage)
 
-event.listen(Project, 'after_insert', after_project_insert)
-event.listen(Project, 'after_update', after_project_update)
-event.listen(Project, 'after_delete', after_project_delete)
+# def after_publication_insert(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.index(index='knowbase',doc_type='publication',id=target.idpublication,
+#              body={
+#                 'idpublication': target.idpublication,
+#                 'title': target.title,
+#                 'authors': target.authors,
+#                 'publication': target.publication,
+#                 'date': target.date,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             })
 
-event.listen(Experience, 'after_insert', after_experience_insert)
-event.listen(Experience, 'after_update', after_experience_update)
-event.listen(Experience, 'after_delete', after_experience_delete)
+# def after_publication_update(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.update(index='knowbase',doc_type='publication',id=target.idpublication,
+#                 body={"doc": {
+#                 'idpublication': target.idpublication,
+#                 'title': target.title,
+#                 'authors': target.authors,
+#                 'publication': target.publication,
+#                 'date': target.date,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             }})
+# def after_publication_delete(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.delete(index='knowbase',doc_type='publication',id=target.idpublication)
 
-event.listen(Language, 'after_insert', after_language_insert)
-event.listen(Language, 'after_update', after_language_update)
-event.listen(Language, 'after_delete', after_language_delete)
+# def after_skill_insert(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.index(index='knowbase',doc_type='skill',id=target.idskill,
+#              body={
+#                 'idskill': target.idskill,
+#                 'name': target.name,
+#                 'level': target.level,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             })
 
-event.listen(Publication, 'after_insert', after_publication_insert)
-event.listen(Publication, 'after_update', after_publication_update)
-event.listen(Publication, 'after_delete', after_publication_delete)
+# def after_skill_update(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.update(index='knowbase',doc_type='skill',id=target.idskill,
+#                 body={"doc": {
+#                 'idskill': target.idskill,
+#                 'name': target.name,
+#                 'level': target.level,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             }})
 
-event.listen(Merit, 'after_insert', after_merit_insert)
-event.listen(Merit, 'after_update', after_merit_update)
-event.listen(Merit, 'after_delete', after_merit_delete)
+# def after_skill_delete(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.delete(index='knowbase',doc_type='skill',id=target.idskill)
 
-event.listen(Skill, 'after_insert', after_skill_insert)
-event.listen(Skill, 'after_update', after_skill_update)
-event.listen(Skill, 'after_delete', after_skill_delete)
+# def after_merit_insert(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.index(index='knowbase',doc_type='merit',id=target.idmerit,
+#              body={
+#                 'idmerit': target.idmerit,
+#                 'name': target.name,
+#                 'date': target.date,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             })
+
+# def after_merit_update(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.update(index='knowbase',doc_type='merit',id=target.idmerit,
+#                 body={"doc": {
+#                 'idmerit': target.idmerit,
+#                 'name': target.name,
+#                 'date': target.date,
+#                 'description': target.description,
+#                 'profile': target.profile
+#             }})
+
+# def after_merit_delete(mapper, connection, target):
+#     es = Elasticsearch()
+#     es.delete(index='knowbase',doc_type='merit',id=target.idmerit)
+
+
+# event.listen(Education, 'after_insert', after_education_insert)
+# event.listen(Education, 'after_update', after_education_update)
+# event.listen(Education, 'after_delete', after_education_delete)
+
+# event.listen(WorkExperience, 'after_insert', after_workexperience_insert)
+# event.listen(WorkExperience, 'after_update', after_workexperience_update)
+# event.listen(WorkExperience, 'after_delete', after_workexperience_delete)
+
+# event.listen(Project, 'after_insert', after_project_insert)
+# event.listen(Project, 'after_update', after_project_update)
+# event.listen(Project, 'after_delete', after_project_delete)
+
+# event.listen(Experience, 'after_insert', after_experience_insert)
+# event.listen(Experience, 'after_update', after_experience_update)
+# event.listen(Experience, 'after_delete', after_experience_delete)
+
+# event.listen(Language, 'after_insert', after_language_insert)
+# event.listen(Language, 'after_update', after_language_update)
+# event.listen(Language, 'after_delete', after_language_delete)
+
+# event.listen(Publication, 'after_insert', after_publication_insert)
+# event.listen(Publication, 'after_update', after_publication_update)
+# event.listen(Publication, 'after_delete', after_publication_delete)
+
+# event.listen(Merit, 'after_insert', after_merit_insert)
+# event.listen(Merit, 'after_update', after_merit_update)
+# event.listen(Merit, 'after_delete', after_merit_delete)
+
+# event.listen(Skill, 'after_insert', after_skill_insert)
+# event.listen(Skill, 'after_update', after_skill_update)
+# event.listen(Skill, 'after_delete', after_skill_delete)
