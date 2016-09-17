@@ -42,14 +42,7 @@ def get_profile_picture():
         return abort(404)
     return jsonify(img.serialize)
 
-@app.route('/api/profile', methods=['POST'])
-@auth.login_required
-def update_profile():
-    profile = g.user.rel_profile
-    profile.update(request.json)
-    db.session.commit()
 
-    return jsonify(response='success')
 
 
 @app.route('/api/signin', methods=['POST'])
@@ -104,6 +97,7 @@ def signup():
     db.session.commit()
     return jsonify(response='success')
 
+
 @app.route('/api/userdetail', methods=['GET'])
 @auth.login_required
 def profile():
@@ -121,6 +115,42 @@ def profile():
 
     return jsonify(data=userdetail.serialize)
 
+@app.route('/api/userdetails', methods=['put'])
+@auth.login_required
+def update_profile():
+    if not request.json:
+        abort(400)
+    iduserdetail = request.json['iduserdetail']
+
+    userdetail = UserDetail.query.get(iduserdetail)
+
+    if userdetail is None:
+        abort(404)
+
+    userdetail.update(request.json)
+    db.session.commit()
+
+    return jsonify(data=userdetail.serialize)
+
+
+@app.route('/api/educations', methods=['PUT'])
+@auth.login_required
+def update_education():
+    if not request.json:
+        abort(400)
+
+    ideducation = request.json['ideducation']
+
+    if ideducation is None:
+        abort(404)
+
+    education = Education.query.get(ideducation)
+    education.update(request.json)
+    db.session.commit()
+
+    return jsonify(data=education.serialize)
+############# /EDUCATIONS #############
+    
 
 @app.route('/api/options', methods=['GET'])
 @auth.login_required
