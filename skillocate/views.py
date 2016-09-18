@@ -4,6 +4,22 @@ from skillocate.models import *
 from flask import Flask, request, jsonify, abort, session, g
 from flask_sqlalchemy import SQLAlchemy
 
+auth = HTTPBasicAuth()
+
+@auth.verify_password
+def verify_password(email_or_token,password):
+    # first try to authenticate by token
+    print("TEST")
+    print(email_or_token)
+    user = User.verify_auth_token(email_or_token)
+    if not user:
+        # try to authenticate with username/password
+        user = User.query.filter_by(email = email_or_token).first()
+        if not user or not user.check_password(password):
+            return False
+    g.user = user
+    return True
+
 @app.route('/api/skilltypes', methods=['GET'])
 @auth.login_required
 def skill_types():
@@ -97,15 +113,13 @@ def signup():
     db.session.commit()
     return jsonify(response='success')
 
-
+############# USERDETAILS #############
 @app.route('/api/userdetail', methods=['GET'])
 @auth.login_required
-def profile():
-    print("!?")
+def get_userdetail():
     iduser = request.args.get('user')
     
     if iduser is None:
-        print(g.user.iduser)
         userdetail = UserDetail.query.filter_by(user=g.user.iduser).first()
     else:
         userdetail = UserDetail.query.filter_by(user=iduser).first()
@@ -115,9 +129,9 @@ def profile():
 
     return jsonify(data=userdetail.serialize)
 
-@app.route('/api/userdetails', methods=['put'])
+@app.route('/api/userdetail', methods=['PUT'])
 @auth.login_required
-def update_profile():
+def update_userdetail():
     if not request.json:
         abort(400)
     iduserdetail = request.json['iduserdetail']
@@ -131,25 +145,7 @@ def update_profile():
     db.session.commit()
 
     return jsonify(data=userdetail.serialize)
-
-
-@app.route('/api/educations', methods=['PUT'])
-@auth.login_required
-def update_education():
-    if not request.json:
-        abort(400)
-
-    ideducation = request.json['ideducation']
-
-    if ideducation is None:
-        abort(404)
-
-    education = Education.query.get(ideducation)
-    education.update(request.json)
-    db.session.commit()
-
-    return jsonify(data=education.serialize)
-############# /EDUCATIONS #############
+############# /USERDETAILS #############
     
 
 @app.route('/api/options', methods=['GET'])
