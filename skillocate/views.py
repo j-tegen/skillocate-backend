@@ -2,6 +2,7 @@ from skillocate import app, auth
 from skillocate import db
 from skillocate.models import *
 from flask import Flask, request, jsonify, abort, session, g
+from flask.ext.httpauth import HTTPBasicAuth
 from flask_sqlalchemy import SQLAlchemy
 
 auth = HTTPBasicAuth()
@@ -130,7 +131,7 @@ def get_userdetail():
     return jsonify(data=userdetail.serialize)
 
 @app.route('/api/userdetailtest', methods=['GET'])
-def get_userdetail():
+def get_userdetailtest():
     iduser = 1
     
     if iduser is None:
