@@ -129,6 +129,20 @@ def get_userdetail():
 
     return jsonify(data=userdetail.serialize)
 
+@app.route('/api/userdetailtest', methods=['GET'])
+def get_userdetail():
+    iduser = 1
+    
+    if iduser is None:
+        userdetail = UserDetail.query.filter_by(user=g.user.iduser).first()
+    else:
+        userdetail = UserDetail.query.filter_by(user=iduser).first()
+
+    if userdetail is None:
+        return abort(404)
+
+    return jsonify(data=userdetail.serialize)
+
 @app.route('/api/userdetail', methods=['PUT'])
 @auth.login_required
 def update_userdetail():
